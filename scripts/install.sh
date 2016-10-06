@@ -18,7 +18,7 @@ pip install awscli
 pip install awsebcli
 cd /usr/local/bin
 wget -q https://releases.hashicorp.com/terraform/0.7.4/terraform_0.7.4_linux_amd64.zip
-unzip terraform_0.6.16_linux_amd64.zip
+unzip terraform_0.7.4_linux_amd64.zip
 # clean up
 apt-get clean
 rm terraform_0.6.16_linux_amd64.zip
