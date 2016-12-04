@@ -1,28 +1,47 @@
 #!/bin/bash
+set -x
+
+TERRAFORM_VERSION="0.7.13"
+PACKER_VERSION="0.10.2"
 # create new ssh key
-mkdir -p /home/ubuntu/.ssh
-ssh-keygen -f /home/ubuntu/.ssh/mykey -N ''
-chown -R ubuntu:ubuntu /home/ubuntu/.ssh
+[[ ! -f /home/ubuntu/.ssh/mykey ]] \
+&& mkdir -p /home/ubuntu/.ssh \
+&& ssh-keygen -f /home/ubuntu/.ssh/mykey -N '' \
+&& chown -R ubuntu:ubuntu /home/ubuntu/.ssh
+
 # install packages
 apt-get update
 apt-get -y install docker.io ansible unzip
 # add docker privileges
 usermod -G docker ubuntu
 # install pip
-wget -q https://bootstrap.pypa.io/get-pip.py
-python get-pip.py
-python3 get-pip.py
-rm -f get-pip.py
+pip install -U pip && pip3 install -U pip
+if [[ $? == 127 ]]; then
+    wget -q https://bootstrap.pypa.io/get-pip.py
+    python get-pip.py
+    python3 get-pip.py
+fi
 # install awscli and ebcli
-pip install awscli
-pip install awsebcli
-cd /usr/local/bin
-wget -q https://releases.hashicorp.com/terraform/0.7.7/terraform_0.7.7_linux_amd64.zip
-unzip terraform_0.7.7_linux_amd64.zip
+pip install -U awscli
+pip install -U awsebcli
+
+#terraform
+T_VERSION=$(terraform -v | head -1 | cut -d ' ' -f 2 | tail -c +2)
+T_RETVAL=${PIPESTATUS[0]}
+
+[[ $T_VERSION != $TERRAFORM_VERSION ]] || [[ $T_RETVAL != 0 ]] \
+&& wget -q https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_amd64.zip \
+&& unzip -o terraform_${TERRAFORM_VERSION}_linux_amd64.zip -d /usr/local/bin \
+&& rm terraform_${TERRAFORM_VERSION}_linux_amd64.zip
+
 # packer
-wget -q https://releases.hashicorp.com/packer/0.10.2/packer_0.10.2_linux_amd64.zip
-unzip packer_0.10.2_linux_amd64.zip
+P_VERSION=$(packer -v)
+P_RETVAL=$?
+
+[[ $P_VERSION != $PACKER_VERSION ]] || [[ $P_RETVAL != 1 ]] \
+&& wget -q https://releases.hashicorp.com/packer/${PACKER_VERSION}/packer_${PACKER_VERSION}_linux_amd64.zip \
+&& unzip -o packer_${PACKER_VERSION}_linux_amd64.zip -d /usr/local/bin \
+&& rm packer_${PACKER_VERSION}_linux_amd64.zip
+
 # clean up
 apt-get clean
-rm terraform_0.7.7_linux_amd64.zip
-rm packer_0.10.2_linux_amd64.zip
