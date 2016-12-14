@@ -17,12 +17,12 @@ rm -f get-pip.py
 pip install awscli
 pip install awsebcli
 cd /usr/local/bin
-wget -q https://releases.hashicorp.com/terraform/0.7.7/terraform_0.7.7_linux_amd64.zip
-unzip terraform_0.7.7_linux_amd64.zip
+wget -q https://releases.hashicorp.com/terraform/0.7.13/terraform_0.7.13_linux_amd64.zip
+unzip terraform_0.7.13_linux_amd64.zip
 # packer
 wget -q https://releases.hashicorp.com/packer/0.10.2/packer_0.10.2_linux_amd64.zip
 unzip packer_0.10.2_linux_amd64.zip
 # clean up
 apt-get clean
-rm terraform_0.7.7_linux_amd64.zip
+rm terraform_0.7.13_linux_amd64.zip
 rm packer_0.10.2_linux_amd64.zip
