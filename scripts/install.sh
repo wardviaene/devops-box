@@ -1,7 +1,7 @@
 #!/bin/bash
 set -x
 
-TERRAFORM_VERSION="0.7.13"
+TERRAFORM_VERSION="0.9.5"
 PACKER_VERSION="0.10.2"
 # create new ssh key
 [[ ! -f /home/ubuntu/.ssh/mykey ]] \
