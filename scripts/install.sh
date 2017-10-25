@@ -1,6 +1,10 @@
 #!/bin/bash
 set -x
 
+if [ -e /etc/redhat-release ] ; then
+  REDHAT_BASED=true
+fi
+
 TERRAFORM_VERSION="0.9.5"
 PACKER_VERSION="0.10.2"
 # create new ssh key
@@ -10,8 +14,13 @@ PACKER_VERSION="0.10.2"
 && chown -R ubuntu:ubuntu /home/ubuntu/.ssh
 
 # install packages
-apt-get update
-apt-get -y install docker.io ansible unzip
+if [ ${REDHAT_BASED} ] ; then
+  yum -y update
+  yum install -y docker ansible unzip wget
+else 
+  apt-get update
+  apt-get -y install docker.io ansible unzip
+fi
 # add docker privileges
 usermod -G docker ubuntu
 # install pip
@@ -26,7 +35,7 @@ pip install -U awscli
 pip install -U awsebcli
 
 #terraform
-T_VERSION=$(terraform -v | head -1 | cut -d ' ' -f 2 | tail -c +2)
+T_VERSION=$(/usr/local/bin/terraform -v | head -1 | cut -d ' ' -f 2 | tail -c +2)
 T_RETVAL=${PIPESTATUS[0]}
 
 [[ $T_VERSION != $TERRAFORM_VERSION ]] || [[ $T_RETVAL != 0 ]] \
@@ -35,7 +44,7 @@ T_RETVAL=${PIPESTATUS[0]}
 && rm terraform_${TERRAFORM_VERSION}_linux_amd64.zip
 
 # packer
-P_VERSION=$(packer -v)
+P_VERSION=$(/usr/local/bin/packer -v)
 P_RETVAL=$?
 
 [[ $P_VERSION != $PACKER_VERSION ]] || [[ $P_RETVAL != 1 ]] \
@@ -44,4 +53,6 @@ P_RETVAL=$?
 && rm packer_${PACKER_VERSION}_linux_amd64.zip
 
 # clean up
-apt-get clean
+if [ ! ${REDHAT_BASED} ] ; then
+  apt-get clean
+fi
