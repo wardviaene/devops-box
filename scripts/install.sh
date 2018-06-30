@@ -22,7 +22,7 @@ else
   apt-get -y install docker.io ansible unzip
 fi
 # add docker privileges
-usermod -G docker ubuntu
+usermod -aG docker ubuntu
 # install pip
 pip install -U pip && pip3 install -U pip
 if [[ $? == 127 ]]; then
