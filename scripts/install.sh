@@ -34,9 +34,6 @@ if [[ $? == 127 ]]; then
     python3 get-pip.py
 fi
 # install awscli and ebcli
-#pip install -U awscli --upgrade --user
-#pip install awsebcli --upgrade --user
-#pip install awsebcli==3.12
 pip install awsebcli==${AWS_EB_CLI} 
 pip install awscli --upgrade
 
