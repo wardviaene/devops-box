@@ -21,20 +21,13 @@ if [ ${REDHAT_BASED} ] ; then
   yum install -y docker ansible unzip wget
 else 
   apt-get update
-  apt-get -y install docker.io ansible unzip
+  apt-get -y install docker.io ansible unzip python3-pip
 fi
 # add docker privileges
 usermod -G docker ubuntu
-# install pip
-pip install -U pip && pip3 install -U pip
-if [[ $? == 127 ]]; then
-    wget -q https://bootstrap.pypa.io/get-pip.py
-    python get-pip.py
-    python3 get-pip.py
-fi
 # install awscli and ebcli
-pip install -U awscli
-pip install -U awsebcli
+pip3 install -U awscli
+pip3 install -U awsebcli
 
 #terraform
 T_VERSION=$(/usr/local/bin/terraform -v | head -1 | cut -d ' ' -f 2 | tail -c +2)
