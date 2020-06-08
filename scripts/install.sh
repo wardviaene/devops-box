@@ -1,14 +1,16 @@
 #!/bin/bash
 
 # remove comment if you want to enable debugging
-#set -x
+set -x
 
 if [ -e /etc/redhat-release ] ; then
   REDHAT_BASED=true
 fi
 
-TERRAFORM_VERSION="0.12.18"
-PACKER_VERSION="1.2.4"
+TERRAFORM_VERSION=`curl -s https://api.github.com/repos/hashicorp/terraform/releases/latest | grep tag_name | cut -d: -f2 | tr -d \"\,\v | awk '{$1=$1};1'`
+PACKER_VERSION=`curl -s https://api.github.com/repos/hashicorp/packer/releases/latest | grep tag_name | cut -d: -f2 | tr -d \"\,\v | awk '{$1=$1};1'`
+AWS_EB_CLI_VERSION=`curl -s https://api.github.com/repos/aws/aws-elastic-beanstalk-cli-setup/releases/latest | grep tag_name | cut -d: -f2 | tr -d \"\,\v | awk '{$1=$1};1'`
+
 # create new ssh key
 [[ ! -f /home/ubuntu/.ssh/mykey ]] \
 && mkdir -p /home/ubuntu/.ssh \
@@ -23,13 +25,14 @@ else
   apt-get update
   apt-get -y install docker.io ansible unzip python3-pip
 fi
+
 # add docker privileges
 usermod -G docker ubuntu
 # install awscli and ebcli
 pip3 install -U awscli
 pip3 install -U awsebcli
 
-#terraform
+# terraform
 T_VERSION=$(/usr/local/bin/terraform -v | head -1 | cut -d ' ' -f 2 | tail -c +2)
 T_RETVAL=${PIPESTATUS[0]}
 
