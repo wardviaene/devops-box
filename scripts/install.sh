@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # remove comment if you want to enable debugging
-set -x
+# set -x
 
 if [ -e /etc/redhat-release ] ; then
   REDHAT_BASED=true
@@ -9,7 +9,6 @@ fi
 
 TERRAFORM_VERSION=`curl -s https://api.github.com/repos/hashicorp/terraform/releases/latest | grep tag_name | cut -d: -f2 | tr -d \"\,\v | awk '{$1=$1};1'`
 PACKER_VERSION=`curl -s https://api.github.com/repos/hashicorp/packer/releases/latest | grep tag_name | cut -d: -f2 | tr -d \"\,\v | awk '{$1=$1};1'`
-AWS_EB_CLI_VERSION=`curl -s https://api.github.com/repos/aws/aws-elastic-beanstalk-cli-setup/releases/latest | grep tag_name | cut -d: -f2 | tr -d \"\,\v | awk '{$1=$1};1'`
 
 # create new ssh key
 [[ ! -f /home/ubuntu/.ssh/mykey ]] \
