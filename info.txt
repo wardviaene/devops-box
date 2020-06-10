@@ -17,16 +17,82 @@ Host devops-box
 
 vagrant ssh devops-box
 
+ansible --version
+docker -v
+aws --version
+packer -v
+terraform version
+
+#rm -rf .vagrant/
+
+vagrant upload scripts/terraform.sh
+vagrant upload scripts/terraform_version.sh
+
+vagrant global-status
+vagrant plugin install vagrant-scp
+vagrant destroy 1a2b3c4d
+vagrant box list
+vagrant status devops-box
+vagrant halt devops-box
+vagrant suspend devops-box
+vagrant up devops-box
+
+vagrant scp devops-box:/home/vagrant/terraform_version.sh "E:\IdeaProjects\devops-box\scripts"
+
 mkdir terraform-test
 cd terraform-test
 vi main.tf
 
+vagrant@ubuntu-bionic:~$ cat main.tf
 variable "myvar" {
  type = "string"
  default = "hello terraform"
 }
 
+variable "mymap" {
+ type = map(string)
+ default = {
+  mykey = "my value"
+ }
+}
+
+variable "mylist" {
+ type = list
+ default = [1, 2, 3]
+}
+
+
 terraform version
 
 terraform console
 var.myvar 
+or
+"${var.myvar}" 
+
+var.mymap
+or
+"${var.mymap}" 
+
+var.mymap["mykey"]
+or
+"${var.mymap["mykey"]}" 
+
+var.mylist
+or
+"${var.mylist}" 
+
+var.mylist[0]
+or
+"${var.mylist[0]}" 
+
+element(var.mylist, 1)
+element(var.mylist, 0)
+slice(var.mylist, 0, 2)
+
+exit
+
+vagrant scp devops-box:/home/vagrant/terraform-test/main.tf "E:\IdeaProjects\devops-box\terraform-test"
+vagrant scp devops-box:/home/vagrant/terraform-test/resource.tf "E:\IdeaProjects\devops-box\terraform-test"
+vagrant scp devops-box:/home/vagrant/terraform-test/terraform.tfvars "E:\IdeaProjects\devops-box\terraform-test"
+
+aws configure

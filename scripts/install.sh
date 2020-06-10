@@ -12,8 +12,9 @@ TERRAFORM_VERSION="0.12.25"
 #TERRAFORM_VERSION="0.12.26"
 #PACKER_VERSION=`curl -s https://api.github.com/repos/hashicorp/packer/releases/latest | grep tag_name | cut -d: -f2 | tr -d \"\,\v | awk '{$1=$1};1'`
 PACKER_VERSION="1.5.4"
+AWS_CLI_VERSION="1.14.44"
 #AWS_EB_CLI_VERSION=`curl -s https://api.github.com/repos/aws/aws-elastic-beanstalk-cli-setup/releases/latest | grep tag_name | cut -d: -f2 | tr -d \"\,\v | awk '{$1=$1};1'`
-AWS_EB_CLI_VERSION="3.12.0"
+AWS_EB_CLI_VERSION="3.11"
 
 # create new ssh key
 [[ ! -f /home/ubuntu/.ssh/mykey ]] \
@@ -24,10 +25,11 @@ AWS_EB_CLI_VERSION="3.12.0"
 # install packages
 if [ ${REDHAT_BASED} ] ; then
   yum -y update
-  yum install -y docker ansible unzip wget
+  yum install -y docker ansible unzip wget awscli
 else 
-  apt-get update
-  apt-get -y install docker.io ansible unzip python3-pip
+  #apt update && apt -y full-upgrade && apt auto-remove
+  apt update
+  apt-get -y install docker.io ansible unzip python3-pip awscli
 fi
 
 # add docker privileges
@@ -36,8 +38,8 @@ usermod -aG docker ubuntu
 # install awscli and ebcli
 #pip3 install -U awscli
 #pip3 install -U awsebcli
-pip3 install awscli -U
-pip3 install awsebcli==${AWS_EB_CLI_VERSION} 
+pip3 install -U awscli==${AWS_CLI_VERSION}
+pip3 install awsebcli==${AWS_EB_CLI_VERSION}
 
 # terraform
 # https://releases.hashicorp.com/terraform/0.12.26/terraform_0.12.26_windows_amd64.zip
@@ -47,20 +49,29 @@ T_RETVAL=${PIPESTATUS[0]}
 [[ $T_VERSION != $TERRAFORM_VERSION ]] || [[ $T_RETVAL != 0 ]] \
 && wget -q https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_amd64.zip \
 && wget -q https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_SHA256SUMS
-sha256sum=$(sha256sum -c terraform_$TERRAFORM_VERSION_SHA256SUMS 2>&1 | grep OK)
-#while [ "$sha256sum" != "OK" ]; do
-#    wget -q https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_amd64.zip \
-#    && wget -q https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_SHA256SUMS
-#    sha256sum=$(sha256sum -c terraform_$TERRAFORM_VERSION_SHA256SUMS 2>&1 | grep OK)
-#    if [ "$sha256sum" = "OK" ]; then
-#        break
-#    fi
-#done
+sha256sum="FAILED"
+retval=1
+while [ $sha256sum != "OK" ] || [ $retval -ne 0 ]; do
+    wget -q https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_amd64.zip \
+    && wget -q https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_SHA256SUMS
+    sha256sum=$(sha256sum -c terraform_${TERRAFORM_VERSION}_SHA256SUMS 2>&1 | grep terraform_${TERRAFORM_VERSION}_linux_amd64.zip | awk {'print $2'} >/dev/null && echo "OK" || echo "FAILED")
+    if [ $sha256sum = "OK" ]; then
+	unzip -o terraform_${TERRAFORM_VERSION}_linux_amd64.zip -d /usr/local/bin
+	rm terraform_${TERRAFORM_VERSION}_linux_amd64.zip
+	which terraform
+	terraform version
+	retval=$?
+	if [ $retval -eq 0 ]; then
+           break
+	fi
+    fi
+done
 
-unzip -o terraform_${TERRAFORM_VERSION}_linux_amd64.zip -d /usr/local/bin \
-&& rm terraform_${TERRAFORM_VERSION}_linux_amd64.zip
-which terraform
-terraform -v
+#unzip -o terraform_${TERRAFORM_VERSION}_linux_amd64.zip -d /usr/local/bin \
+#&& rm terraform_${TERRAFORM_VERSION}_linux_amd64.zip
+#which terraform
+#terraform version
+
 
 # packer
 # https://releases.hashicorp.com/packer/1.5.6/packer_1.5.6_windows_amd64.zip
@@ -70,20 +81,29 @@ P_RETVAL=$?
 [[ $P_VERSION != $PACKER_VERSION ]] || [[ $P_RETVAL != 1 ]] \
 && wget -q https://releases.hashicorp.com/packer/${PACKER_VERSION}/packer_${PACKER_VERSION}_linux_amd64.zip \
 && wget -q https://releases.hashicorp.com/packer/${PACKER_VERSION}/packer_${PACKER_VERSION}_SHA256SUMS \
-sha256sum=$(sha256sum -c packer_${PACKER_VERSION}_SHA256SUMS 2>&1 | grep OK)
-#while [ "$sha256sum" != "OK" ]; do
-#    wget -q https://releases.hashicorp.com/packer/${PACKER_VERSION}/packer_${PACKER_VERSION}_linux_amd64.zip \
-#    && wget -q https://releases.hashicorp.com/packer/${PACKER_VERSION}/packer_${PACKER_VERSION}_SHA256SUMS
-#    sha256sum=$(sha256sum -c packer_${PACKER_VERSION}_SHA256SUMS 2>&1 | grep OK)
-#    if [ "$sha256sum" = "OK" ]; then
-#        break
-#    fi
-#done
+sha256sum=$(sha256sum -c packer_${PACKER_VERSION}_SHA256SUMS 2>&1 | grep packer_${PACKER_VERSION}_linux_amd64.zip | awk {'print $2'} >/dev/null && echo "OK" || echo "FAILED")
 
-unzip -o packer_${PACKER_VERSION}_linux_amd64.zip -d /usr/local/bin \
-&& rm packer_${PACKER_VERSION}_linux_amd64.zip
-which packer
-packer -v
+for version in `curl -s https://releases.hashicorp.com/packer/ | grep packer | cut -d/ -f3 | awk '{$1=$1};1'`; do
+    wget -q https://releases.hashicorp.com/packer/${version}/packer_${version}_linux_amd64.zip \
+    && wget -q https://releases.hashicorp.com/packer/${version}/packer_${version}_SHA256SUMS
+    #sha256sum=$(sha256sum -c packer_${version}_SHA256SUMS | grep packer_${version}_linux_amd64.zip | awk {'print $2'} >/dev/null && echo "OK" || echo "FAILED") 
+    sha256sum=$(sha256sum -c packer_${version}_SHA256SUMS | grep packer_${version}_linux_amd64.zip | cut -d: -f2 >/dev/null && echo "OK" || echo "FAILED") 
+    if [ $sha256sum = "OK" ]; then
+	unzip -o packer_${version}_linux_amd64.zip -d /usr/local/bin
+	rm packer_${version}_linux_amd64.zip
+	which packer
+	packer -v
+	retval=$?
+	if [ $retval -eq 0 ]; then
+           break
+	fi
+    fi
+done
+
+#unzip -o packer_${PACKER_VERSION}_linux_amd64.zip -d /usr/local/bin \
+#&& rm packer_${PACKER_VERSION}_linux_amd64.zip
+#which packer
+#packer -v
 
 # clean up
 if [ ! ${REDHAT_BASED} ] ; then

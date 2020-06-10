@@ -8,8 +8,12 @@ for version in `curl -s https://releases.hashicorp.com/packer/ | grep packer | c
     sha256sum=$(sha256sum -c packer_${version}_SHA256SUMS | grep packer_${version}_linux_amd64.zip | cut -d: -f2 >/dev/null && echo "OK" || echo "FAILED") 
     if [ $sha256sum = "OK" ]; then
 	echo $version
+	sudo unzip -o packer_${version}_linux_amd64.zip -d /usr/local/bin \
+	&& rm packer_${version}_linux_amd64.zip
         break
     fi
 done
 cd ..
 rm -rf download
+which packer
+packer -v

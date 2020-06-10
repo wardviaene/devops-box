@@ -12,8 +12,12 @@ for version in `curl -s https://releases.hashicorp.com/terraform/ | grep terrafo
     sha256sum=$(sha256sum -c terraform_${version}_SHA256SUMS | grep terraform_${version}_linux_amd64.zip | cut -d: -f2 >/dev/null && echo "OK" || echo "FAILED") 
     if [ $sha256sum = "OK" ]; then
 	echo $version
+	sudo unzip -o terraform_${version}_linux_amd64.zip -d /usr/local/bin \
+	&& rm terraform_${version}_linux_amd64.zip
         break
     fi
 done
 cd ..
 rm -rf download
+which terraform
+terraform version
