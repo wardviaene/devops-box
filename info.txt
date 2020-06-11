@@ -1,6 +1,8 @@
 #bcdedit /set hypervisorlaunchtype off
 #bcdedit /set hypervisorlaunchtype auto
 
+http://www.cloudping.info/
+
 vagrant up
 vagrant ssh-config
 
@@ -27,6 +29,10 @@ terraform version
 
 vagrant upload scripts/terraform.sh
 vagrant upload scripts/terraform_version.sh
+vagrant upload terraform-test/main.tf
+vagrant upload terraform-test/resource.tf
+vagrant upload terraform-test/terraform.tfvars
+
 
 vagrant global-status
 vagrant plugin install vagrant-scp
@@ -95,4 +101,38 @@ vagrant scp devops-box:/home/vagrant/terraform-test/main.tf "E:\IdeaProjects\dev
 vagrant scp devops-box:/home/vagrant/terraform-test/resource.tf "E:\IdeaProjects\devops-box\terraform-test"
 vagrant scp devops-box:/home/vagrant/terraform-test/terraform.tfvars "E:\IdeaProjects\devops-box\terraform-test"
 
+vagrant box update
+vagrant provision
+
 aws configure
+
+#export TF_LOG=TRACE
+#export TF_LOG=DEBUG
+#export TF_LOG=INFO
+
+https://www.terraform.io/docs/extend/writing-custom-providers.html
+
+mkdir -p .terraform.d/plugins/linux_amd64
+cd .terraform.d/plugins/linux_amd64
+wget -q https://releases.hashicorp.com/terraform-provider-google/3.25.0/terraform-provider-google_3.25.0_linux_amd64.zip
+unzip -o terraform-provider-google_3.25.0_linux_amd64.zip
+rm -f terraform-provider-google_3.25.0_linux_amd64.zip
+
+mkdir -p .terraform.d/plugins/linux_amd64
+cd .terraform.d/plugins/linux_amd64
+wget -q https://releases.hashicorp.com/terraform-provider-azure/0.1.1/terraform-provider-azure_0.1.1_linux_amd64.zip
+unzip -o terraform-provider-azure_0.1.1_linux_amd64.zip
+rm -f terraform-provider-azure_0.1.1_linux_amd64.zip
+
+mkdir -p .terraform.d/plugins/linux_amd64
+cd .terraform.d/plugins/linux_amd64
+wget -q https://releases.hashicorp.com/terraform-provider-aws/2.65.0/terraform-provider-aws_2.65.0_linux_amd64.zip
+unzip -o terraform-provider-aws_2.65.0_linux_amd64.zip
+rm -f terraform-provider-aws_2.65.0_linux_amd64.zip
+
+cd terraform-test
+terraform init
+terraform console
+
+var.AWS_REGION
+

@@ -8,8 +8,8 @@ if [ -e /etc/redhat-release ] ; then
 fi
 
 #TERRAFORM_VERSION=`curl -s https://api.github.com/repos/hashicorp/terraform/releases/latest | grep tag_name | cut -d: -f2 | tr -d \"\,\v | awk '{$1=$1};1'`
-TERRAFORM_VERSION="0.12.25"
-#TERRAFORM_VERSION="0.12.26"
+#TERRAFORM_VERSION="0.12.25"
+TERRAFORM_VERSION="0.12.26"
 #PACKER_VERSION=`curl -s https://api.github.com/repos/hashicorp/packer/releases/latest | grep tag_name | cut -d: -f2 | tr -d \"\,\v | awk '{$1=$1};1'`
 PACKER_VERSION="1.5.4"
 AWS_CLI_VERSION="1.14.44"
@@ -89,14 +89,14 @@ for version in `curl -s https://releases.hashicorp.com/packer/ | grep packer | c
     #sha256sum=$(sha256sum -c packer_${version}_SHA256SUMS | grep packer_${version}_linux_amd64.zip | awk {'print $2'} >/dev/null && echo "OK" || echo "FAILED") 
     sha256sum=$(sha256sum -c packer_${version}_SHA256SUMS | grep packer_${version}_linux_amd64.zip | cut -d: -f2 >/dev/null && echo "OK" || echo "FAILED") 
     if [ $sha256sum = "OK" ]; then
-	unzip -o packer_${version}_linux_amd64.zip -d /usr/local/bin
-	rm packer_${version}_linux_amd64.zip
-	which packer
-	packer -v
-	retval=$?
-	if [ $retval -eq 0 ]; then
-           break
-	fi
+		unzip -o packer_${version}_linux_amd64.zip -d /usr/local/bin
+		rm packer_${version}_linux_amd64.zip
+		which packer
+		packer -v
+		retval=$?
+		if [ $retval -eq 0 ]; then
+			   break
+		fi
     fi
 done
 

@@ -1,1 +1,1 @@
-AWS_REGION={eu-central-1}
+AWS_REGION="eu-central-1"
