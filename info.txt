@@ -27,6 +27,7 @@ terraform version
 
 #rm -rf .vagrant/
 
+vagrant upload scripts/packer.sh
 vagrant upload scripts/terraform.sh
 vagrant upload scripts/terraform_version.sh
 vagrant upload terraform-test/main.tf
@@ -100,6 +101,12 @@ exit
 vagrant scp devops-box:/home/vagrant/terraform-test/main.tf "E:\IdeaProjects\devops-box\terraform-test"
 vagrant scp devops-box:/home/vagrant/terraform-test/resource.tf "E:\IdeaProjects\devops-box\terraform-test"
 vagrant scp devops-box:/home/vagrant/terraform-test/terraform.tfvars "E:\IdeaProjects\devops-box\terraform-test"
+vagrant scp devops-box:/home/vagrant/terraform-test/main.tf /e/IdeaProjects/devops-box/terraform-test/main.tf
+vagrant scp devops-box:/home/vagrant/terraform-test/resource.tf /e/IdeaProjects/devops-box/terraform-test/resource.tf
+vagrant scp devops-box:/home/vagrant/terraform-test/terraform.tfvars /e/IdeaProjects/devops-box/terraform-test/terraform.tfvars
+vagrant scp terraform-test/main.tf devops-box:/home/vagrant/terraform-test/main.tf 
+vagrant scp terraform-test/resource.tf devops-box:/home/vagrant/terraform-test/resource.tf
+vagrant scp terraform-test/terraform.tfvars devops-box:/home/vagrant/terraform-test/terraform.tfvars
 
 vagrant box update
 vagrant provision
@@ -135,4 +142,4 @@ terraform init
 terraform console
 
 var.AWS_REGION
-
+var.AMIS[var.AWS_REGION]
