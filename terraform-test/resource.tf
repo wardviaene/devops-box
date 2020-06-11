@@ -25,5 +25,5 @@ resource "aws_instance" "example2" {
 
 resource "aws_instance" "example3" {
 	ami	= var.AMIS[var.AWS_REGION]
-	instance_type = "t2.micro"
+	instance_type = "t2.small"
 }

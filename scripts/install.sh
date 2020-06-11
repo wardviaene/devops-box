@@ -15,6 +15,9 @@ PACKER_VERSION="1.5.4"
 AWS_CLI_VERSION="1.14.44"
 #AWS_EB_CLI_VERSION=`curl -s https://api.github.com/repos/aws/aws-elastic-beanstalk-cli-setup/releases/latest | grep tag_name | cut -d: -f2 | tr -d \"\,\v | awk '{$1=$1};1'`
 AWS_EB_CLI_VERSION="3.11"
+AWS_PROVIDER_VERSION=`curl -s https://api.github.com/repos/terraform-providers/terraform-provider-aws/releases/latest | grep tag_name | cut -d: -f2 | tr -d \"\,\v | awk '{$1=$1};1'`
+GOOGLE_CLOUD_PROVIDER_VERSION=`curl -s https://api.github.com/repos/terraform-providers/terraform-provider-google/releases/latest | grep tag_name | cut -d: -f2 | tr -d \"\,\v | awk '{$1=$1};1'`
+AZURE_PROVIDER_VERSION=`curl -s https://api.github.com/repos/terraform-providers/terraform-provider-azurerm/releases/latest | grep tag_name | cut -d: -f2 | tr -d \"\,\v | awk '{$1=$1};1'`
 
 # create new ssh key
 [[ ! -f /home/ubuntu/.ssh/mykey ]] \
@@ -104,6 +107,28 @@ done
 #&& rm packer_${PACKER_VERSION}_linux_amd64.zip
 #which packer
 #packer -v
+
+user=$(whoami)
+cd /home/vagrant
+mkdir -p .terraform.d/plugins/linux_amd64
+cd .terraform.d/plugins/linux_amd64
+
+# installing some providers
+
+# google provider
+wget -q https://releases.hashicorp.com/terraform-provider-google/${GOOGLE_CLOUD_PROVIDER_VERSION}/terraform-provider-google_${GOOGLE_CLOUD_PROVIDER_VERSION}_linux_amd64.zip
+unzip -o terraform-provider-google_${GOOGLE_CLOUD_PROVIDER_VERSION}_linux_amd64.zip
+rm -f terraform-provider-google_${GOOGLE_CLOUD_PROVIDER_VERSION}_linux_amd64.zip
+
+# azure provider
+wget -q https://releases.hashicorp.com/terraform-provider-azure/${AZURE_PROVIDER_VERSION}/terraform-provider-azure_${AZURE_PROVIDER_VERSION}_linux_amd64.zip
+unzip -o terraform-provider-azure_${AZURE_PROVIDER_VERSION}_linux_amd64.zip
+rm -f terraform-provider-azure_${AZURE_PROVIDER_VERSION}_linux_amd64.zip
+
+# aws provider
+wget -q https://releases.hashicorp.com/terraform-provider-aws/${AWS_PROVIDER_VERSION}/terraform-provider-aws_${AWS_PROVIDER_VERSION}_linux_amd64.zip
+unzip -o terraform-provider-aws_${AWS_PROVIDER_VERSION}_linux_amd64.zip
+rm -f terraform-provider-aws_${AWS_PROVIDER_VERSION}_linux_amd64.zip
 
 # clean up
 if [ ! ${REDHAT_BASED} ] ; then

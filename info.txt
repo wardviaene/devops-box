@@ -34,7 +34,6 @@ vagrant upload terraform-test/main.tf
 vagrant upload terraform-test/resource.tf
 vagrant upload terraform-test/terraform.tfvars
 
-
 vagrant global-status
 vagrant plugin install vagrant-scp
 vagrant destroy 1a2b3c4d
@@ -45,6 +44,22 @@ vagrant suspend devops-box
 vagrant up devops-box
 
 vagrant scp devops-box:/home/vagrant/terraform_version.sh "E:\IdeaProjects\devops-box\scripts"
+
+vagrant scp devops-box:/home/vagrant/terraform-test/main.tf "E:\IdeaProjects\devops-box\terraform-test"
+vagrant scp devops-box:/home/vagrant/terraform-test/resource.tf "E:\IdeaProjects\devops-box\terraform-test"
+vagrant scp devops-box:/home/vagrant/terraform-test/terraform.tfvars "E:\IdeaProjects\devops-box\terraform-test"
+vagrant scp devops-box:/home/vagrant/terraform-test/main.tf /e/IdeaProjects/devops-box/terraform-test/main.tf
+vagrant scp devops-box:/home/vagrant/terraform-test/resource.tf /e/IdeaProjects/devops-box/terraform-test/resource.tf
+vagrant scp devops-box:/home/vagrant/terraform-test/terraform.tfvars /e/IdeaProjects/devops-box/terraform-test/terraform.tfvars
+vagrant scp terraform-test/main.tf devops-box:/home/vagrant/terraform-test/main.tf 
+vagrant scp terraform-test/resource.tf devops-box:/home/vagrant/terraform-test/resource.tf
+vagrant scp terraform-test/terraform.tfvars devops-box:/home/vagrant/terraform-test/terraform.tfvars
+
+vagrant box update
+vagrant provision
+vagrant up --provision devops-box
+vagrant reload --provision devops-box
+vagrant reload --provision
 
 mkdir terraform-test
 cd terraform-test
@@ -97,19 +112,6 @@ element(var.mylist, 0)
 slice(var.mylist, 0, 2)
 
 exit
-
-vagrant scp devops-box:/home/vagrant/terraform-test/main.tf "E:\IdeaProjects\devops-box\terraform-test"
-vagrant scp devops-box:/home/vagrant/terraform-test/resource.tf "E:\IdeaProjects\devops-box\terraform-test"
-vagrant scp devops-box:/home/vagrant/terraform-test/terraform.tfvars "E:\IdeaProjects\devops-box\terraform-test"
-vagrant scp devops-box:/home/vagrant/terraform-test/main.tf /e/IdeaProjects/devops-box/terraform-test/main.tf
-vagrant scp devops-box:/home/vagrant/terraform-test/resource.tf /e/IdeaProjects/devops-box/terraform-test/resource.tf
-vagrant scp devops-box:/home/vagrant/terraform-test/terraform.tfvars /e/IdeaProjects/devops-box/terraform-test/terraform.tfvars
-vagrant scp terraform-test/main.tf devops-box:/home/vagrant/terraform-test/main.tf 
-vagrant scp terraform-test/resource.tf devops-box:/home/vagrant/terraform-test/resource.tf
-vagrant scp terraform-test/terraform.tfvars devops-box:/home/vagrant/terraform-test/terraform.tfvars
-
-vagrant box update
-vagrant provision
 
 aws configure
 
