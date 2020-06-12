@@ -145,3 +145,14 @@ terraform console
 
 var.AWS_REGION
 var.AMIS[var.AWS_REGION]
+
+https://cloud-images.ubuntu.com/locator/ec2/
+
+terraform plan
+terraform apply
+terraform destroy
+
+terraform plan -out out.terraform
+terraform apply out.terraform
+ 
+
