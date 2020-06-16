@@ -4,6 +4,8 @@ sha256sum="FAILED"
 retval=1
 #echo $sha256sum
 #echo $retval
+mkdir download
+cd download
 while [ $sha256sum != "OK" ] || [ $retval -ne 0 ]; do
     wget -q https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_amd64.zip \
     && wget -q https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_SHA256SUMS
@@ -21,3 +23,5 @@ while [ $sha256sum != "OK" ] || [ $retval -ne 0 ]; do
 		fi
     fi
 done
+cd ..
+rm -rf download
