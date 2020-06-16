@@ -117,6 +117,8 @@ aws configure
 #export TF_LOG=DEBUG
 #export TF_LOG=INFO
 
+#export VAGRANT_DISABLE_VBOXSYMLINKCREATE=1
+
 https://www.terraform.io/docs/extend/writing-custom-providers.html
 
 mkdir -p .terraform.d/plugins/linux_amd64
@@ -163,4 +165,22 @@ ssh-keygen -f mykey
 ssh -i "mykey" ubuntu@18.197.163.93
 ssh -i "mykey" ubuntu@ec2-18-197-163-93.eu-central-1.compute.amazonaws.com
 
+
+#Vagrant up - VBoxManage.exe error: VT-x is not available
+
+Stop hyper-v service running by default in Windows 8/10, since it blocks all other calls to VT hardware.
+
+Additional explanation here: https://social.technet.microsoft.com/Forums/windows/en-US/118561b9-7155-46e3-a874-6a38b35c67fd/hyperv-disables-vtx-for-other-hypervisors?forum=w8itprogeneral
+
+Also as you have mentioned, if not already enabled, turn on Intel VT virtualization in BIOS settings and restart the machine.
+
+To turn Hypervisor off, run this from Command Prompt (Admin) (Windows+X):
+
+bcdedit /set hypervisorlaunchtype off
+and reboot your computer. To turn it back on again, run:
+
+bcdedit /set hypervisorlaunchtype on
+If you receive "The integer data is not valid as specified", try:
+
+bcdedit /set hypervisorlaunchtype auto
 
