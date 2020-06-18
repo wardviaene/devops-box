@@ -188,4 +188,3 @@ sudo apt-get install ntpdate; ntpdate ntp.ubuntu.com
 ssh-keygen -f mykey
 ssh -i "mykey" ubuntu@18.197.163.93
 ssh -i "mykey" ubuntu@ec2-18-197-163-93.eu-central-1.compute.amazonaws.com
-
