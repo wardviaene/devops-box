@@ -57,6 +57,8 @@ vagrant upload terraform-test/terraform.tfvars
 vagrant global-status
 vagrant plugin install vagrant-scp
 vagrant destroy 1a2b3c4d
+vagrant destroy devops-box
+vagrant destroy -f devops-box
 vagrant box list
 vagrant status devops-box
 vagrant halt devops-box
@@ -74,6 +76,7 @@ vagrant scp devops-box:/home/vagrant/terraform-test/terraform.tfvars /e/IdeaProj
 vagrant scp terraform-test/main.tf devops-box:/home/vagrant/terraform-test/main.tf 
 vagrant scp terraform-test/resource.tf devops-box:/home/vagrant/terraform-test/resource.tf
 vagrant scp terraform-test/terraform.tfvars devops-box:/home/vagrant/terraform-test/terraform.tfvars
+vagrant scp terraform devops-box:/home/vagrant
 
 vagrant box update
 vagrant provision
@@ -81,6 +84,7 @@ vagrant up --provision devops-box
 vagrant reload
 vagrant reload --provision devops-box
 vagrant reload --provision
+vagrant --debug ssh
 
 mkdir terraform-test
 cd terraform-test
@@ -188,3 +192,36 @@ sudo apt-get install ntpdate; ntpdate ntp.ubuntu.com
 ssh-keygen -f mykey
 ssh -i "mykey" ubuntu@18.197.163.93
 ssh -i "mykey" ubuntu@ec2-18-197-163-93.eu-central-1.compute.amazonaws.com
+ssh -i mykey -l ubuntu ec2-18-197-163-93.eu-central-1.compute.amazonaws.com
+ssh -i mykey -l ubuntu -o "StrictHostKeyChecking no" ec2-18-197-163-93.eu-central-1.compute.amazonaws.com
+ssh -i mykey -l ubuntu -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no ec2-18-197-163-93.eu-central-1.compute.amazonaws.com
+
+#What you do is fix the networking on the server and add some extra time for the boot:
+start the VM, log in to the server via GUI (username: vagrant, password: vagrant) and run the following commands
+
+sudo apt install -y ifupdown
+sudo vi /etc/network/interfaces.d/eth0
+
+# add  this
+auto eth0
+iface eth0 inet dhcp
+
+sudo /etc/init.d/networking restart
+
+$ sudo ifdown eth0
+$ sudo ifup eth0
+then add the following to the file /etc/rc.local
+
+ifdown eth0
+ifup eth0
+on the host, add the following to the Vagrantfile
+
+
+config.vm.boot_timeout = 600
+
+#Error vagrant ssh fails with VirtualBox
+1.- in the VagrantFile, add the gui mode : config.vm.boot_mode = :gui
+2.- run vagrant up
+3.- in the gui, log with the user "vagrant" (password = "vagrant")
+4.- in the gui, run sudo /etc/init.d/networking restart, in /etc/network/interfaces file, you must now have a section with #VAGRANT-BEGIN [...]#VAGRANT-END
+5.- run vagrant reload on the physical machine
