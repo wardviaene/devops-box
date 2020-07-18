@@ -1,0 +1,74 @@
+Stderr: VBoxManage.exe: error: Call to WHvSetupPartition failed
+
+Note about VirtualBox 6.1.0. This topic has the name it has because that was how most users encountered the problem of VT-x/AMD-v hardware accelerated virtualization not being available. 
+If the topic had been called "VT-x not available error" then newbies may not have understood the relevance. However VirtualBox 6.1.0 now requires VT-x/AMD-v to be available (or Windows NEM, 
+but we'll leave that for now) for all VMs, whether 32bit, 64bit, single or multiple vCPU and so on. The original text remains below, the "bittedness" stuff is now less relevant, but the 
+underlying problem and solutions have not changed.
+
+VirtualBox requires hardware support for virtualization (Intel VT-x or AMD-v) in order to run certain categories of VM. This includes all 64bit VMs, and all VMs which use >1 CPU core. OS X hosts 
+require VT-x/AMD-v for every VM. Starting with VirtualBox 6.1.0 the latter is now true for all other hosts. The developers clearly feel that supporting older machines that don't have this hardware
+ feature is no longer justified commercially.
+
+To ensure that you can still run VMs in those categories, run through the following checklist :-
+
+Note your exact CPU model or part number, then go online and check its capabilities. The CPU must be 64bit and support either Intel or AMD virtualization technologies: VT-x or AMD-v.
+.
+You usually need to enable VT-x/AMD-v in the host PC BIOS. You need to check with your PC manual or support forum to find out how to boot into the BIOS screen. This is probably not something we 
+here at the VirtualBox forums can help you with. Once you get there you need to look for something buried in a menu, perhaps in the security category. The option may be called something like 
+"Enable Virtualization Technology", "Enable SVM Mode" (AMD CPUs), "Enable Vanderpool Technology" (Intel), or perhaps "Secure Virtual Mode". If you see "Virtual Directed I/O" (VT-d/AMD-Vi) then 
+that is a different thing. If you can find the latter option but can't find the former, and it's a recent PC (post 2016) then it's likely that VT-x/AMD-v is enabled by default in your BIOS, so 
+go to step 3! Remember to cycle power on your host PC after making and saving the BIOS changes - in this case a full restart from power off is required, just rebooting or resuming from a 
+hibernated state may not do the job.
+.
+If (1) and (2) are already taken care of, then make sure that no other host apps are already using VT-x/AMD-v. The usual culprits are system level debuggers, other VM platforms, and some resident
+ anti-virus applications. This has become a particular issue with 64bit Windows desktop and server hosts - especially Win2k12 and Win10, as these may enable Microsoft's Hyper-v VM platform by 
+default: this grabs ownership of VT-x and won't play nice with VirtualBox. Note: see the third post below for other Win10 functions that have this effect.
+.
+When creating a VM, make sure you choose the 64-bit version of the guest OS template in <VM Settings> | General | Basic | Version, e.g. choose "Ubuntu (64 bit)" and not 
+"Ubuntu" or "Ubuntu (32bit)". This has become more important since VirtualBox 4.3.x, because choosing the correct template also allows other modern processor features to be visible to the 
+guest - it's not just about 64bit capability any more.
+
+Additional Notes for Windows Hosts
+
+1.- To check the status of Hyper-v in Windows 10, <right click start> | Run | OptionalFeatures.exe, and look for the "Hyper-V" option. The box should be empty, not checked or shaded. If you want 
+to be absolutely sure that Hyper-v is gone then open an administrator command console and type "bcdedit /set hypervisorlaunchtype off". Make sure to fully power down and reboot the host after 
+changing the Hyper-v setting.
+
+2.- On some Windows hosts with an EFI BIOS, DeviceGuard or CredentialGuard may be active by default, and interferes with OS level virtualization apps in the same way that Hyper-v does. These 
+features
+ need to be disabled. On Pro versions of Windows you can do this using gpedit.msc (set Local Computer Policy > Computer Configuration > Administrative Templates > System > Device Guard > 
+Turn on Virtualization Based Security to Disabled. CredentialGuard is a subset of DeviceGuard, so disabling the former should be enough. If you cannot use gpedit for some reason then the 
+equivalent registry hack is to find the key HKLM|SYSTEM|CurrentControlSet|Control|DeviceGuard|EnableVirtualizationBasedSecurity|Enabled and set it to 0.
+
+3.- On Win10 hosts, check Windows Defender > Device Security > Core Isolation Details and make sure settings in this panel are turned off, reboot the host from power down if you needed to 
+make changes.
+"Core isolation [includes] security features available on your device that use virtualization-based security"
+...which is why they can interfere with VirtualBox.
+
+
+
+The following information is courtesy of user "Socratis". He has made a list of new features that Microsoft have added to Windows 10 which implicitly enable Hyper-V and therefore prevent VirtualBox from using VT-x directly. In an ideal world these should all be disabled, and please understand that Microsoft seems to be adding to this list all the time.
+
+Socratis wrote:
+Here's the list that I have so far:
+
+Application Guard
+Credential Guard (see https://www.microsoft.com/en-us/downloa ... x?id=53337)
+Device Guard (see https://www.microsoft.com/en-us/downloa ... x?id=53337)
+<any> * Guard
+Containers
+Hyper-V
+Virtual Machine Platform
+Windows Hypervisor Platform
+Windows Sandbox
+Windows Server Containers
+Windows Subsystem for Linux 2 (WSL2) (WSL1 does not enable Hyper-V)
+
+If that doesn't work, enter the following command:
+
+bcdedit /set hypervisorlaunchtype off
+
+followed by a cold boot, i.e. shut down the computer, pull the power plug for 10 seconds, reboot.
+
+If Hyper-V cannot be disabled, e.g. due to company policy, then VirtualBox v6.x has a new ability to run via the Windows Hypervisor Platform, however Windows 10 (1809) or later is required, 
+the feature still has bugs (as of VirtualBox 6.0.8), and it currently causes a significant drop in VM performance.

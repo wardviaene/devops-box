@@ -1,0 +1,227 @@
+#bcdedit /set hypervisorlaunchtype off
+#bcdedit /set hypervisorlaunchtype on
+#bcdedit /set hypervisorlaunchtype auto
+
+#Vagrant up - VBoxManage.exe error: VT-x is not available
+
+Stop hyper-v service running by default in Windows 8/10, since it blocks all other calls to VT hardware.
+
+Additional explanation here: https://social.technet.microsoft.com/Forums/windows/en-US/118561b9-7155-46e3-a874-6a38b35c67fd/hyperv-disables-vtx-for-other-hypervisors?forum=w8itprogeneral
+
+Also as you have mentioned, if not already enabled, turn on Intel VT virtualization in BIOS settings and restart the machine.
+
+To turn Hypervisor off, run this from Command Prompt (Admin) (Windows+X):
+
+bcdedit /set hypervisorlaunchtype off
+and reboot your computer. To turn it back on again, run:
+
+bcdedit /set hypervisorlaunchtype on
+If you receive "The integer data is not valid as specified", try:
+
+bcdedit /set hypervisorlaunchtype auto
+
+#In Windows Features elimite windows Sandbox so you can use both vagrant and docker toguether
+
+vagrant up
+vagrant ssh-config
+-------------------------------
+Host devops-box
+  HostName 127.0.0.1
+  User vagrant
+  Port 2222
+  UserKnownHostsFile /dev/null
+  StrictHostKeyChecking no
+  PasswordAuthentication no
+  IdentityFile E:/IdeaProjects/devops-box/.vagrant/machines/devops-box/virtualbox/private_key
+  IdentitiesOnly yes
+  LogLevel FATAL
+-------------------------------
+
+vagrant ssh devops-box
+
+ansible --version
+docker -v
+aws --version
+packer -v
+terraform version
+
+#rm -rf .vagrant/
+
+vagrant upload scripts/packer.sh
+vagrant upload scripts/terraform.sh
+vagrant upload scripts/terraform_version.sh
+vagrant upload terraform-test/main.tf
+vagrant upload terraform-test/resource.tf
+vagrant upload terraform-test/terraform.tfvars
+
+vagrant global-status
+vagrant plugin install vagrant-scp
+vagrant destroy 1a2b3c4d
+vagrant destroy devops-box
+vagrant destroy -f devops-box
+vagrant box list
+vagrant status devops-box
+vagrant halt devops-box
+vagrant suspend devops-box
+vagrant up devops-box
+
+vagrant scp devops-box:/home/vagrant/terraform_version.sh "E:\IdeaProjects\devops-box\scripts"
+
+vagrant scp devops-box:/home/vagrant/terraform-test/main.tf "E:\IdeaProjects\devops-box\terraform-test"
+vagrant scp devops-box:/home/vagrant/terraform-test/resource.tf "E:\IdeaProjects\devops-box\terraform-test"
+vagrant scp devops-box:/home/vagrant/terraform-test/terraform.tfvars "E:\IdeaProjects\devops-box\terraform-test"
+vagrant scp devops-box:/home/vagrant/terraform-test/main.tf /e/IdeaProjects/devops-box/terraform-test/main.tf
+vagrant scp devops-box:/home/vagrant/terraform-test/resource.tf /e/IdeaProjects/devops-box/terraform-test/resource.tf
+vagrant scp devops-box:/home/vagrant/terraform-test/terraform.tfvars /e/IdeaProjects/devops-box/terraform-test/terraform.tfvars
+vagrant scp terraform-test/main.tf devops-box:/home/vagrant/terraform-test/main.tf 
+vagrant scp terraform-test/resource.tf devops-box:/home/vagrant/terraform-test/resource.tf
+vagrant scp terraform-test/terraform.tfvars devops-box:/home/vagrant/terraform-test/terraform.tfvars
+vagrant scp terraform devops-box:/home/vagrant
+
+vagrant box update
+vagrant provision
+vagrant up --provision devops-box
+vagrant reload
+vagrant reload --provision devops-box
+vagrant reload --provision
+vagrant --debug ssh
+
+mkdir terraform-test
+cd terraform-test
+vi main.tf
+
+vagrant@ubuntu-bionic:~$ cat main.tf
+variable "myvar" {
+ type = "string"
+ default = "hello terraform"
+}
+
+variable "mymap" {
+ type = map(string)
+ default = {
+  mykey = "my value"
+ }
+}
+
+variable "mylist" {
+ type = list
+ default = [1, 2, 3]
+}
+
+
+terraform version
+
+terraform console
+var.myvar 
+or
+"${var.myvar}" 
+
+var.mymap
+or
+"${var.mymap}" 
+
+var.mymap["mykey"]
+or
+"${var.mymap["mykey"]}" 
+
+var.mylist
+or
+"${var.mylist}" 
+
+var.mylist[0]
+or
+"${var.mylist[0]}" 
+
+element(var.mylist, 1)
+element(var.mylist, 0)
+slice(var.mylist, 0, 2)
+
+exit
+
+aws configure
+
+#export TF_LOG=TRACE
+#export TF_LOG=DEBUG
+#export TF_LOG=INFO
+
+#export VAGRANT_DISABLE_VBOXSYMLINKCREATE=1
+
+https://www.terraform.io/docs/extend/writing-custom-providers.html
+
+mkdir -p .terraform.d/plugins/linux_amd64
+cd .terraform.d/plugins/linux_amd64
+wget -q https://releases.hashicorp.com/terraform-provider-google/3.25.0/terraform-provider-google_3.25.0_linux_amd64.zip
+unzip -o terraform-provider-google_3.25.0_linux_amd64.zip
+rm -f terraform-provider-google_3.25.0_linux_amd64.zip
+
+mkdir -p .terraform.d/plugins/linux_amd64
+cd .terraform.d/plugins/linux_amd64
+wget -q https://releases.hashicorp.com/terraform-provider-azure/0.1.1/terraform-provider-azure_0.1.1_linux_amd64.zip
+unzip -o terraform-provider-azure_0.1.1_linux_amd64.zip
+rm -f terraform-provider-azure_0.1.1_linux_amd64.zip
+
+mkdir -p .terraform.d/plugins/linux_amd64
+cd .terraform.d/plugins/linux_amd64
+wget -q https://releases.hashicorp.com/terraform-provider-aws/2.69.0/terraform-provider-aws_2.69.0_linux_amd64.zip
+unzip -o terraform-provider-aws_2.69.0_linux_amd64.zip
+rm -f terraform-provider-aws_2.69.0_linux_amd64.zip
+
+cd terraform-test
+terraform init
+terraform console
+terraform providers
+
+var.AWS_REGION
+var.AMIS[var.AWS_REGION]
+
+http://www.cloudping.info/
+https://cloud-images.ubuntu.com/locator/ec2/
+
+terraform plan
+terraform apply
+terraform show
+terraform destroy
+
+terraform plan -out out.terraform
+terraform apply out.terraform
+terraform show
+terraform destroy
+ 
+sudo apt-get install ntpdate; ntpdate ntp.ubuntu.com
+
+ssh-keygen -f mykey
+ssh -i "mykey" ubuntu@18.197.163.93
+ssh -i "mykey" ubuntu@ec2-18-197-163-93.eu-central-1.compute.amazonaws.com
+ssh -i mykey -l ubuntu ec2-18-197-163-93.eu-central-1.compute.amazonaws.com
+ssh -i mykey -l ubuntu -o "StrictHostKeyChecking no" ec2-18-197-163-93.eu-central-1.compute.amazonaws.com
+ssh -i mykey -l ubuntu -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no ec2-18-197-163-93.eu-central-1.compute.amazonaws.com
+
+#What you do is fix the networking on the server and add some extra time for the boot:
+start the VM, log in to the server via GUI (username: vagrant, password: vagrant) and run the following commands
+
+sudo apt install -y ifupdown
+sudo vi /etc/network/interfaces.d/eth0
+
+# add  this
+auto eth0
+iface eth0 inet dhcp
+
+sudo /etc/init.d/networking restart
+
+$ sudo ifdown eth0
+$ sudo ifup eth0
+then add the following to the file /etc/rc.local
+
+ifdown eth0
+ifup eth0
+on the host, add the following to the Vagrantfile
+
+
+config.vm.boot_timeout = 600
+
+#Error vagrant ssh fails with VirtualBox
+1.- in the VagrantFile, add the gui mode : config.vm.boot_mode = :gui
+2.- run vagrant up
+3.- in the gui, log with the user "vagrant" (password = "vagrant")
+4.- in the gui, run sudo /etc/init.d/networking restart, in /etc/network/interfaces file, you must now have a section with #VAGRANT-BEGIN [...]#VAGRANT-END
+5.- run vagrant reload on the physical machine
