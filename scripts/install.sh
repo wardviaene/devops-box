@@ -7,8 +7,8 @@ if [ -e /etc/redhat-release ] ; then
   REDHAT_BASED=true
 fi
 
-TERRAFORM_VERSION="0.12.18"
-PACKER_VERSION="1.2.4"
+TERRAFORM_VERSION="1.0.8"
+PACKER_VERSION="1.7.6"
 # create new ssh key
 [[ ! -f /home/ubuntu/.ssh/mykey ]] \
 && mkdir -p /home/ubuntu/.ssh \
