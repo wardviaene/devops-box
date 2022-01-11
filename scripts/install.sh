@@ -9,7 +9,8 @@ fi
 
 #TERRAFORM_VERSION=`curl -s https://api.github.com/repos/hashicorp/terraform/releases/latest | grep tag_name | cut -d: -f2 | tr -d \"\,\v | awk '{$1=$1};1'`
 #TERRAFORM_VERSION="0.12.25"
-TERRAFORM_VERSION="0.12.26"
+#TERRAFORM_VERSION="0.12.26"
+TERRAFORM_VERSION="1.1.3"
 #PACKER_VERSION=`curl -s https://api.github.com/repos/hashicorp/packer/releases/latest | grep tag_name | cut -d: -f2 | tr -d \"\,\v | awk '{$1=$1};1'`
 #PACKER_VERSION="1.5.4"
 PACKER_VERSION="1.6.0"
