@@ -15,4 +15,5 @@ Vagrant.configure(2) do |config|
 		  v.cpus = 2
    		end
 	end
+	config.vm.boot_timeout = 1440
 end

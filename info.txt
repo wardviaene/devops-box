@@ -87,6 +87,11 @@ vagrant reload --provision devops-box
 vagrant reload --provision
 vagrant --debug ssh
 
+vagrant plugin repair
+vagrant plugin expunge --reinstall
+vagrant plugin update
+
+
 mkdir terraform-test
 cd terraform-test
 vi main.tf
@@ -163,8 +168,11 @@ rm -f terraform-provider-azure_0.1.1_linux_amd64.zip
 
 mkdir -p .terraform.d/plugins/linux_amd64
 cd .terraform.d/plugins/linux_amd64
+#wget -q https://releases.hashicorp.com/terraform-provider-aws/2.66.0/terraform-provider-aws_2.66.0_linux_amd64.zip
 wget -q https://releases.hashicorp.com/terraform-provider-aws/2.69.0/terraform-provider-aws_2.69.0_linux_amd64.zip
+#unzip -o terraform-provider-aws_2.66.0_linux_amd64.zip
 unzip -o terraform-provider-aws_2.69.0_linux_amd64.zip
+#rm -f terraform-provider-aws_2.66.0_linux_amd64.zip
 rm -f terraform-provider-aws_2.69.0_linux_amd64.zip
 
 cd terraform-test
